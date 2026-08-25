@@ -1,4 +1,4 @@
-const VERSION = '20260825-b';
+const VERSION = '20260825-c';
 const CACHE = 'xinyi-' + VERSION;
 const CORE = [
   './',
