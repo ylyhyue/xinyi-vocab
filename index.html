@@ -3875,10 +3875,34 @@ let session=null;
 const SPK='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 8a5 5 0 010 8"/></svg>';
 
 /* 真人发音（浏览器内置语音，无需联网密钥） */
+let _voiceList=[];
+function _primeVoices(){
+  if(!('speechSynthesis' in window)) return;
+  try{ _voiceList=speechSynthesis.getVoices()||[]; }catch(e){}
+  if(typeof speechSynthesis.onvoiceschanged!=='function'){
+    speechSynthesis.onvoiceschanged=function(){ try{ _voiceList=speechSynthesis.getVoices()||[]; }catch(e){} };
+  }
+}
+_primeVoices();
+function _pickVoice(lang){
+  if(!_voiceList.length) return null;
+  const key=lang.toLowerCase().replace('_','-');
+  return _voiceList.find(function(v){return (v.lang||'').toLowerCase().replace('_','-')===key;})
+      || _voiceList.find(function(v){return (v.lang||'').toLowerCase().replace('_','-').slice(0,2)===key.slice(0,2);})
+      || null;
+}
 function speak(text,lang){
   lang=lang||'en-US';
-  if(!('speechSynthesis' in window)) return;
-  try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text); u.lang=lang; u.rate=0.9; speechSynthesis.speak(u); }catch(e){}
+  if(!('speechSynthesis' in window) || !text) return;
+  try{
+    // Android Chrome：先取消正在播放的，避免 stuck speaking 状态吞掉新语音
+    if(speechSynthesis.speaking || speechSynthesis.pending){ speechSynthesis.cancel(); }
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang=lang; u.rate=0.9; u.pitch=1;
+    const v=_pickVoice(lang); if(v) u.voice=v;
+    // Android Chrome：cancel() 与 speak() 不能同一同步块，否则整段静音；延后一点播
+    setTimeout(function(){ try{ speechSynthesis.speak(u); }catch(e){} }, 90);
+  }catch(e){}
 }
 function setProgress(p){ document.getElementById('studyProgress').style.width=Math.max(0,Math.min(100,p))+'%'; }
 function switchPage(p){
