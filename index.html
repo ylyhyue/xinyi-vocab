@@ -378,6 +378,33 @@
     .examq .eqopts{grid-template-columns:1fr}
     .bookgrid{grid-template-columns:1fr}
   }
+
+/* ====== 新增：打卡 / 错词本 / 小测试 / 数据同步 ====== */
+.remind{display:flex;align-items:center;gap:10px;background:linear-gradient(90deg,rgba(255,203,71,.16),rgba(88,101,242,.12));border:1px solid rgba(255,203,71,.4);border-radius:14px;padding:12px 16px;margin-bottom:14px;cursor:pointer;color:#fff;font-size:14px}
+.remind .bell{width:22px;height:22px;flex:0 0 22px}
+.remind.done{background:rgba(53,237,126,.12);border-color:rgba(53,237,126,.4);cursor:default}
+.weakbox.gold{border-color:rgba(255,203,71,.45)}
+.weakbox.gold .val{color:var(--gold)}
+.weakbox.gold .ic svg{stroke:var(--gold)}
+.launch{background:var(--panel);border-radius:18px;padding:22px;margin-bottom:14px}
+.launch h3{margin:0 0 6px;font-size:18px}
+.launch p{color:var(--sub);font-size:13px;margin:0 0 16px}
+.launch .row{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+.launch .row .lab{width:100%;font-size:13px;color:var(--sub);margin-bottom:2px}
+.chip{background:var(--panel-2);border:1.5px solid var(--line);color:#fff;border-radius:999px;padding:8px 16px;font-size:13px;cursor:pointer;font-family:inherit}
+.chip.on{background:var(--blue);border-color:var(--blue);font-weight:700}
+.wblist{background:var(--panel);border-radius:18px;padding:6px 14px;margin-bottom:14px}
+.wbrow2{display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid var(--line)}
+.wbrow2:last-child{border-bottom:0}
+.wbrow2 .w{font-weight:800;font-size:16px;min-width:110px}
+.wbrow2 .m{color:var(--sub);font-size:13px;flex:1}
+.wbrow2 .badge{background:rgba(255,122,122,.16);color:#ff8d8d;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:700}
+.wbrow2 .bd{color:var(--sub);font-size:11px;min-width:62px;text-align:right}
+.wbempty{color:var(--sub);text-align:center;padding:30px;font-size:14px}
+.synbtn{display:flex;gap:12px;flex-wrap:wrap}
+.synbtn button{flex:1;min-width:130px;background:var(--panel);border:1px solid var(--line);color:#fff;border-radius:14px;padding:16px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:8px}
+.synbtn button .ic{width:26px;height:26px}
+.synbtn button:hover{border-color:var(--blue)}
 </style>
 </head>
 <body>
@@ -401,6 +428,8 @@
       <a href="#" onclick="go('reward')"><svg viewBox="0 0 24 24" fill="none" stroke="#b9c0f0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v4a5 5 0 01-10 0z"/><path d="M7 6H4v2a3 3 0 003 3M17 6h3v2a3 3 0 01-3 3M9 20h6M12 13v7"/></svg>闯关奖励</a>
       <a href="#" onclick="go('books')"><svg viewBox="0 0 24 24" fill="none" stroke="#b9c0f0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h12a4 4 0 014 4v12H8a4 4 0 01-4-4z"/><path d="M4 16a4 4 0 014-4h12"/></svg>分册考试</a>
       <a href="#" onclick="go('voice')"><svg viewBox="0 0 24 24" fill="none" stroke="#b9c0f0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v3"/></svg>口述互动</a>
+      <a href="#" onclick="go('wrongbook')"><svg viewBox="0 0 24 24" fill="none" stroke="#b9c0f0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 2.4 18a2 2 0 001.7 3h15.8a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/></svg>错词本</a>
+      <a href="#" onclick="go('quiz')"><svg viewBox="0 0 24 24" fill="none" stroke="#b9c0f0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>小测试</a>
     </nav>
     <div class="foot">爸爸岳永强 为欣怡打造<br>数据存在本机，可随时导出备份</div>
   </aside>
@@ -427,6 +456,10 @@
     <!-- 今天待处理 -->
     <div class="sec">
       <h2>今天待处理 <span class="tag" id="todoCount">3 项</span></h2>
+      <div class="remind hidden" id="remindBanner" onclick="doCheckin()">
+        <svg class="bell" viewBox="0 0 24 24" fill="none" stroke="#ffcb47" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg>
+        <span id="remindText">今天还没打卡哦，点这里打卡领 +20 分 🔥</span>
+      </div>
       <div class="stats" style="grid-template-columns:repeat(3,1fr)">
         <div class="stat" style="cursor:pointer" onclick="go('long')">
           <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#35ed7e" stroke-width="2"><path d="M12 20c0-6 0-9 0-9M12 11c-3 0-5-2-5-5 3 0 5 2 5 5zM12 11c3 0 5-2 5-5-3 0-5 2-5 5z"/></svg></div>
@@ -441,7 +474,7 @@
           <div class="lab">闯关挑战</div><div class="val num" id="sStage">1</div><div class="sub">闯过即解锁成就</div>
         </div>
       </div>
-      <!-- 今日目标环 + 薄弱词本（多邻国式动力可视化） -->
+      <!-- 今日目标环 + 错词本 + 打卡（多邻国式动力可视化） -->
       <div class="dashrow">
         <div class="goalwrap" title="今天学的词越多，环越满">
           <svg class="ring" viewBox="0 0 80 80">
@@ -450,9 +483,13 @@
           </svg>
           <div class="goaltext"><b class="num" id="goalPct">0%</b><span>今日目标</span><small class="num" id="goalNum">0/20</small></div>
         </div>
-        <div class="weakbox" style="cursor:pointer" onclick="startWeak()">
+        <div class="weakbox" style="cursor:pointer" onclick="go('wrongbook')">
           <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#ff7a7a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 2.4 18a2 2 0 001.7 3h15.8a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/></svg></div>
-          <div class="lab">薄弱词本</div><div class="val num" id="weakCount">0</div><div class="sub">点这里再练一遍</div>
+          <div class="lab">错词本</div><div class="val num" id="weakCount">0</div><div class="sub">点这里再练一遍</div>
+        </div>
+        <div class="weakbox gold" id="checkinBox" style="cursor:pointer" onclick="doCheckin()">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#ffcb47" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c1 3-2 4.5-1 7.5a2.5 2.5 0 005 0c0-1.6-1-2.6-1-2.6 2.2 1.4 3.2 4.2 3.2 6.6a6.5 6.5 0 11-13 0C5 9.5 8.8 7.5 12 2z"/></svg></div>
+          <div class="lab">今日打卡</div><div class="val num" id="checkinVal">—</div><div class="sub" id="checkinSub">点我 +20 分</div>
         </div>
       </div>
     </div>
@@ -488,6 +525,17 @@
       <div class="bookgrid" id="bookgridHome"></div>
       <div style="margin-top:16px">
         <button class="btn long" onclick="go('books')" style="background:var(--panel-2);color:#fff;border:none;padding:13px 22px;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer">查看完整分册地图 →</button>
+      </div>
+    </div>
+
+    <!-- 数据同步（手机↔电脑） -->
+    <div class="sec">
+      <h2>数据同步 <span class="tag">手机 ↔ 电脑</span></h2>
+      <p style="color:var(--sub);font-size:13px;margin:0 0 12px">导出进度后在另一台设备「导入」，即可把已掌握 / 错词 / 打卡全部搬过去。建议每周导一份备份。</p>
+      <div class="synbtn">
+        <button onclick="exportData()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#35ed7e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>导出进度</button>
+        <button onclick="importData()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#5865f2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21V9M7 14l5-5 5 5M5 3h14"/></svg>导入进度</button>
+        <button onclick="enableReminder()"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="#ffcb47" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg>开启每日提醒</button>
       </div>
     </div>
 
@@ -735,6 +783,26 @@
       <span class="t">考试结果</span>
     </div>
     <div class="examres" id="examResBody"></div>
+  </div>
+</div>
+
+<div class="study hidden" id="wrongbook">
+  <div class="wrap" style="max-width:680px">
+    <div class="bar">
+      <button class="back" onclick="go('home')"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>返回</button>
+      <span class="t">错词本</span>
+    </div>
+    <div id="wbBody"></div>
+  </div>
+</div>
+
+<div class="study hidden" id="quiz">
+  <div class="wrap" style="max-width:680px">
+    <div class="bar">
+      <button class="back" onclick="go('home')"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>返回</button>
+      <span class="t">小测试</span>
+    </div>
+    <div id="quizBody"></div>
   </div>
 </div>
 
@@ -3756,6 +3824,8 @@ function migrate(w){
   if(w.due==null) w.due=Date.now();
   if(w.box==null) w.box=(w.status==='mastered')?3:(w.status==='learning'?1:0);
   if(w.weak==null) w.weak=false;
+  if(w.mistakes==null) w.mistakes=0;
+  if(w.lastWrong==null) w.lastWrong=0;
   return w;
 }
 function loadWords(){
@@ -3786,7 +3856,7 @@ function loadWords(){
 function saveWords(w){ localStorage.setItem(KEY,JSON.stringify(w)); }
 function loadState(){
   let s=localStorage.getItem(STATE);
-  const base={points:1280,lv:3,streak:7,ach:['初芽','连续7天','首闯三关'],dailyDate:'',dailyDone:0,dailyTarget:20};
+  const base={points:1280,lv:3,streak:7,ach:['初芽','连续7天','首闯三关'],dailyDate:'',dailyDone:0,dailyTarget:20,checkins:[],remind:false};
   if(!s){ s=base; localStorage.setItem(STATE,JSON.stringify(s)); }
   try{ const p=JSON.parse(s); return Object.assign(base,p); }catch(e){ return base; }
 }
@@ -3801,15 +3871,15 @@ function refreshHome(){
   const learning=WORDS.filter(w=>w.status==='learning').length;
   document.getElementById('lvText').textContent='Lv.'+ST.lv;
   document.getElementById('ptText').textContent=ST.points+' 积分';
-  document.getElementById('stText').textContent='连续 '+ST.streak+' 天';
+  document.getElementById('stText').textContent='连续 '+computeStreak()+' 天';
   // 今日待处理：基于遗忘曲线真实到期量
   const now=Date.now();
   const dueCount=WORDS.filter(w=>w.due<=now && w.status!=='mastered').length;
   document.getElementById('sReview').textContent=dueCount||'—';
   document.getElementById('sNew').textContent=batchSize;
   document.getElementById('sStage').textContent=1;
-  // 薄弱词本
-  const weakCount=WORDS.filter(w=>w.weak && w.status!=='mastered').length;
+  // 错词本（答错过的词）
+  const weakCount=WORDS.filter(w=>(w.mistakes>0||w.weak) && w.status!=='mastered').length;
   const wc=document.getElementById('weakCount'); if(wc) wc.textContent=weakCount;
   // 今日目标环（跨天归零）
   const td=new Date().toISOString().slice(0,10);
@@ -3818,8 +3888,13 @@ function refreshHome(){
   const rf=document.getElementById('ringFg'); if(rf) rf.style.strokeDashoffset=(213.6*(1-pct/100)).toFixed(1);
   const gp=document.getElementById('goalPct'); if(gp) gp.textContent=pct+'%';
   const gn=document.getElementById('goalNum'); if(gn) gn.textContent=ST.dailyDone+'/'+(ST.dailyTarget||20);
-  document.getElementById('todoCount').textContent=(dueCount>0?'1 项复习':'0 项复习')+(weakCount>0?' +'+weakCount+' 薄弱':'');
+  document.getElementById('todoCount').textContent=(dueCount>0?'1 项复习':'0 项复习')+(weakCount>0?' +'+weakCount+' 错词':'');
   document.getElementById('greetSub').textContent='已掌握 '+mastered+' 个，词库共 '+total+' 个，每天进步一点点';
+  // 打卡盒
+  const checkedToday=(ST.checkins||[]).includes(td);
+  const cv=document.getElementById('checkinVal'); if(cv) cv.textContent=checkedToday?'✓':(computeStreak()+' 天');
+  const csub=document.getElementById('checkinSub'); if(csub) csub.textContent=checkedToday?'今日已打卡 🔥':'点我 +20 分';
+  renderReminder();
   // 奖励页
   const t2=document.getElementById('track2');
   if(t2){
@@ -3847,7 +3922,7 @@ renderBooks('bookgridHome');
 
 /* ====== 页面路由 ====== */
 function go(page){
-  ['home','study','build','reward','voice','books','exam','examRes'].forEach(p=>document.getElementById(p).classList.add('hidden'));
+  ['home','study','build','reward','voice','books','exam','examRes','wrongbook','quiz'].forEach(p=>document.getElementById(p).classList.add('hidden'));
   if(page==='home'){ document.getElementById('home').classList.remove('hidden'); refreshHome(); setNav('home'); renderBooks('bookgridHome'); }
   if(page==='build'){ document.getElementById('build').classList.remove('hidden'); renderWords(); setNav('build'); }
   if(page==='reward'){ document.getElementById('reward').classList.remove('hidden'); refreshHome(); setNav('reward'); }
@@ -3855,6 +3930,8 @@ function go(page){
   if(page==='books'){ document.getElementById('books').classList.remove('hidden'); renderBooks('bookgrid'); renderHist(); setNav('books'); }
   if(page==='exam'){ document.getElementById('exam').classList.remove('hidden'); setNav('books'); }
   if(page==='examRes'){ document.getElementById('examRes').classList.remove('hidden'); setNav('books'); }
+  if(page==='wrongbook'){ document.getElementById('wrongbook').classList.remove('hidden'); setNav('wrongbook'); openWrongbook(); }
+  if(page==='quiz'){ document.getElementById('quiz').classList.remove('hidden'); setNav('quiz'); renderQuizLaunch(); }
   if(page==='picto'){ go('home'); toast('象形字卡在学习时自动出现哦～点"开始集中学习"试试'); }
   if(page==='focus'){ startFocus(); }
   if(page==='long'){ startLong(); }
@@ -3862,7 +3939,7 @@ function go(page){
   closeMenu();
 }
 function setNav(id){
-  const map={home:0,focus:1,long:2,picto:3,build:4,reward:5,books:6,voice:7};
+  const map={home:0,focus:1,long:2,picto:3,build:4,reward:5,books:6,voice:7,wrongbook:8,quiz:9};
   const idx=map[id];
   document.querySelectorAll('.nav a').forEach(a=>a.classList.remove('active'));
   if(idx!=null){ const a=document.querySelectorAll('.nav a')[idx]; if(a) a.classList.add('active'); }
@@ -3906,7 +3983,7 @@ function speak(text,lang){
 }
 function setProgress(p){ document.getElementById('studyProgress').style.width=Math.max(0,Math.min(100,p))+'%'; }
 function switchPage(p){
-  ['home','study','build','reward','voice','books','exam','examRes'].forEach(x=>document.getElementById(x).classList.add('hidden'));
+  ['home','study','build','reward','voice','books','exam','examRes','wrongbook','quiz'].forEach(x=>document.getElementById(x).classList.add('hidden'));
   document.getElementById(p).classList.remove('hidden');
 }
 
@@ -3995,7 +4072,7 @@ function answer(ok){
     w.weak=false;
     ST.points+=5;
   }else{
-    w.weak=true; w.due=Date.now(); // 没记住，今天就得再练
+    markWrong(w.word); // 没记住，今天就得再练
     if(!session.wrong.includes(w.word)) session.wrong.push(w.word);
   }
   saveWords(WORDS); saveState(ST); checkLevel();
@@ -4057,7 +4134,7 @@ function pickOpt(chosen,correct){
     opts.forEach(o=>{ if(o.textContent===correct) o.classList.add('right'); else if(o.textContent===chosen) o.classList.add('wrong'); });
     fb.className='qfeedback miss'; fb.textContent='没关系～正确答案已标绿，多看两眼就记住了';
     session.hearts=Math.max(0,session.hearts-1);
-    cw.weak=true; cw.due=Date.now();
+    markWrong(cw.word);
     if(!session.wrong.includes(correct)) session.wrong.push(correct);
   }
   saveWords(WORDS); saveState(ST); refreshHome();
@@ -4074,7 +4151,7 @@ function checkSpell(target){
   }else{
     fb.className='qfeedback miss'; fb.textContent='差不多啦～正确拼写是 '+target+'，再读两遍就熟';
     session.hearts=Math.max(0,session.hearts-1);
-    w.weak=true; w.due=Date.now();
+    markWrong(w.word);
     if(!session.wrong.includes(target)) session.wrong.push(target);
   }
   saveWords(WORDS); saveState(ST); refreshHome();
@@ -4106,7 +4183,7 @@ function finishSession(){
       '<div class="acts"><button class="again" onclick="go(\'home\')">回到工作台</button><button class="home" onclick="restartSame()">再练一轮</button></div>'+
     '</div>';
   // 把本轮出错/没记住的词正式归入薄弱词本，今天就得再练
-  session.wrong.forEach(ww=>{ const x=WORDS.find(k=>k.word===ww); if(x){ x.weak=true; x.due=Date.now(); } });
+  session.wrong.forEach(ww=>{ markWrong(ww); });
   saveWords(WORDS);
   // 每日目标累计（跨天归零）
   const td=new Date().toISOString().slice(0,10);
@@ -4169,13 +4246,193 @@ function doImport(e){
   r.onload=ev=>{
     try{
       const d=JSON.parse(ev.target.result);
-      if(d.words) WORDS=d.words;
-      if(d.state) ST=d.state;
+      if(d.words && Array.isArray(d.words)){
+        const importMap={}; d.words.forEach(w=>importMap[(w.word||'').toLowerCase()]=w);
+        const merged=[]; const seen=new Set();
+        d.words.forEach(w=>{ merged.push(w); seen.add((w.word||'').toLowerCase()); });
+        // 补回当前词库里导入文件没有的词（通常是新版本预设新增词，不能丢）
+        WORDS.forEach(w=>{ const k=(w.word||'').toLowerCase(); if(!seen.has(k)){ merged.push(w); seen.add(k); } });
+        WORDS=merged.map(migrate);
+      }
+      if(d.state && typeof d.state==='object'){
+        const base=loadState();
+        ST.points=Math.max(base.points||0, d.state.points||0);
+        ST.lv=base.lv; ST.ach=base.ach;
+        ST.checkins=Array.from(new Set((base.checkins||[]).concat(d.state.checkins||[]))).sort();
+        ST.examHistory=(d.state.examHistory||[]).concat(base.examHistory||[]).slice(-80);
+        ST.dailyDate=base.dailyDate; ST.dailyDone=base.dailyDone; ST.dailyTarget=base.dailyTarget||20;
+      }
       saveWords(WORDS); saveState(ST); renderWords(); refreshHome();
-      toast('导入成功！');
+      toast('导入成功！进度已合并');
     }catch(err){ toast('文件格式不对，导入失败'); }
   };
   r.readAsText(f);
+}
+
+/* ====== 新增：打卡 / 错词本 / 小测试 / 数据同步提醒 ====== */
+// 错词统计：答错一次 +1，并记录最近错词时间
+function markWrong(word){
+  const x=WORDS.find(k=>k.word===word);
+  if(x){ x.weak=true; x.due=Date.now(); x.mistakes=(x.mistakes||0)+1; x.lastWrong=Date.now(); saveWords(WORDS); }
+}
+// 连续打卡天数（由 checkins 计算，断签即归零）
+function computeStreak(){
+  const cs=(ST.checkins||[]).slice().sort();
+  if(!cs.length) return 0;
+  const today=new Date(), y=new Date(today); y.setDate(y.getDate()-1);
+  const td=today.toISOString().slice(0,10), yd=y.toISOString().slice(0,10);
+  const last=cs[cs.length-1];
+  if(last!==td && last!==yd) return 0;
+  let streak=0; let d=new Date(last);
+  while(cs.includes(d.toISOString().slice(0,10))){ streak++; d.setDate(d.getDate()-1); }
+  return streak;
+}
+function doCheckin(){
+  const td=new Date().toISOString().slice(0,10);
+  if((ST.checkins||[]).includes(td)){ toast('今天已经打卡啦，真棒！'); return; }
+  if(!ST.checkins) ST.checkins=[];
+  ST.checkins.push(td);
+  ST.points=(ST.points||0)+20;
+  saveState(ST); refreshHome();
+  toast('打卡成功！+20 积分，连续 '+computeStreak()+' 天 🔥');
+}
+function renderReminder(){
+  const td=new Date().toISOString().slice(0,10);
+  const done=(ST.checkins||[]).includes(td);
+  const b=document.getElementById('remindBanner'); if(!b) return;
+  const t=document.getElementById('remindText');
+  if(done){ b.classList.add('done'); b.classList.remove('hidden'); if(t)t.textContent='今天已打卡 ✓ 连续 '+computeStreak()+' 天，继续保持！'; }
+  else { b.classList.remove('done'); b.classList.remove('hidden'); if(t)t.textContent='今天还没打卡哦，点这里打卡领 +20 分 🔥'; }
+}
+// 错词本页面
+function openWrongbook(){
+  const list=WORDS.filter(w=>(w.mistakes>0||w.weak) && w.status!=='mastered')
+                 .sort((a,b)=>(b.mistakes||0)-(a.mistakes||0));
+  const total=list.length;
+  const mostWrong=list[0];
+  let html='<div class="launch" style="padding:18px">'
+    +'<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px"><h3 style="margin:0">累计错词 '+total+' 个</h3>'
+    +'<span style="color:var(--sub);font-size:13px">'+(mostWrong?('最易错：'+mostWrong.word+'（'+(mostWrong.mistakes||0)+' 次）'):'暂无')+'</span></div>'
+    +(total?'<button class="btn long" style="background:var(--blue);color:#fff;border:none;padding:13px 22px;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;width:100%" onclick="startWeak()">开始复习错词本 →</button>'
+          :'<div class="wbempty">还没有错词，太厉害啦！去做几套小测试试试 👏</div>')
+    +'</div>';
+  if(total){
+    html+='<div class="wblist">';
+    list.slice(0,200).forEach(w=>{
+      const d=w.lastWrong?new Date(w.lastWrong).toLocaleDateString('zh-CN'):'—';
+      html+='<div class="wbrow2"><div class="w num">'+w.word+'</div>'
+        +'<div class="m">'+ (w.mean||'') +'</div>'
+        +'<div class="badge">'+(w.mistakes||0)+' 次</div>'
+        +'<div class="bd">'+d+'</div></div>';
+    });
+    html+='</div>';
+  }
+  const el=document.getElementById('wbBody'); if(el) el.innerHTML=html;
+}
+// 小测试（轻量自测，不限时，错题自动进错词本）
+let mini=null;
+function renderQuizLaunch(){
+  const scopes=[{id:'all',name:'全部词库'},{id:'wrong',name:'只测错词本'}].concat(BOOKS.map(b=>({id:b.id,name:b.name})));
+  let html='<div class="launch"><h3>小测试 · 轻量自测</h3><p>不限时、即时判分，答错的词自动进错词本。选好范围和题数就能开始。</p>'
+    +'<div class="row"><div class="lab">测试范围</div>';
+  scopes.forEach((s,i)=>{ html+='<button class="chip'+(i===0?' on':'')+'" data-scope="'+s.id+'" onclick="pickScope(this)">'+s.name+'</button>'; });
+  html+='</div><div class="row"><div class="lab">题目数量</div>';
+  [5,10,15,20].forEach((n,i)=>{ html+='<button class="chip'+(i===1?' on':'')+'" data-count="'+n+'" onclick="pickCount(this)">'+n+' 题</button>'; });
+  html+='</div><button class="btn long" style="background:var(--blue);color:#fff;border:none;padding:13px 22px;border-radius:12px;font-weight:700;font-size:15px;cursor:pointer;width:100%" onclick="startMini()">开始小测试 →</button></div>';
+  const el=document.getElementById('quizBody'); if(el) el.innerHTML=html;
+  mini={scope:'all',count:10};
+}
+function pickScope(el){ document.querySelectorAll('#quizBody [data-scope]').forEach(b=>b.classList.remove('on')); el.classList.add('on'); if(mini) mini.scope=el.getAttribute('data-scope'); }
+function pickCount(el){ document.querySelectorAll('#quizBody [data-count]').forEach(b=>b.classList.remove('on')); el.classList.add('on'); if(mini) mini.count=parseInt(el.getAttribute('data-count')); }
+function startMini(){
+  let pool;
+  if(mini.scope==='wrong') pool=WORDS.filter(w=>(w.mistakes>0||w.weak)&&w.status!=='mastered');
+  else if(mini.scope==='all') pool=WORDS.filter(w=>w.status!=='mastered');
+  else pool=WORDS.filter(w=>w.book===mini.scope && w.status!=='mastered');
+  if(pool.length<4){ toast('这个范围词太少啦，换一个吧'); return; }
+  pool=pool.slice().sort(()=>Math.random()-0.5).slice(0,mini.count);
+  mini.list=pool; mini.idx=0; mini.score=0; mini.total=pool.length; mini.wrong=[];
+  renderMiniQ();
+}
+function renderMiniQ(){
+  if(mini.idx>=mini.total){ finishMini(); return; }
+  const w=mini.list[mini.idx]; const body=document.getElementById('quizBody');
+  const pct=Math.round(mini.idx/mini.total*100);
+  const mode=(mini.idx%2===0)?'w2m':'m2w';
+  let html='<div class="examtop"><div class="ename">小测试 · 第 '+(mini.idx+1)+' / '+mini.total+' 题</div><div class="einfo"><span>得分 <b>'+mini.score+'</b></span></div></div>'
+    +'<div class="exambar"><div class="fill" style="width:'+pct+'%"></div></div>'
+    +'<div class="examq"><div class="eqno">'+(mode==='w2m'?'看单词，选出正确释义':'看释义，选出正确单词')+'</div>';
+  if(mode==='w2m'){
+    html+='<div class="eqword num">'+w.word+'</div>';
+    const opts=distractors4(w);
+    html+='<div class="eqopts">'+opts.map(m=>{
+      const cor=(m===w.mean)?'1':'0';
+      return '<button data-val="'+m.replace(/"/g,'&quot;')+'" data-correct="'+cor+'" onclick="answerMini(this)">'+m+'</button>';
+    }).join('')+'</div>';
+  }else{
+    html+='<div class="eqword num" style="font-size:20px;color:#fff">'+w.mean+'</div>';
+    const others=WORDS.filter(x=>x.word!==w.word).sort(()=>Math.random()-0.5).slice(0,3).map(x=>x.word);
+    const opts=others.concat([w.word]).sort(()=>Math.random()-0.5);
+    html+='<div class="eqopts">'+opts.map(m=>{
+      const cor=(m===w.word)?'1':'0';
+      return '<button data-val="'+m.replace(/"/g,'&quot;')+'" data-correct="'+cor+'" onclick="answerMini(this)">'+m+'</button>';
+    }).join('')+'</div>';
+  }
+  html+='</div>';
+  body.innerHTML=html;
+}
+function answerMini(btn){
+  if(btn.disabled) return;
+  const correct=btn.getAttribute('data-correct')==='1';
+  const btns=document.querySelectorAll('#quizBody .eqopts button');
+  btns.forEach(b=>b.disabled=true);
+  const w=mini.list[mini.idx];
+  if(correct){
+    btn.classList.add('right');
+    mini.score++;
+    if(w.box!=null){ w.box=Math.min(3,w.box+1); w.due=Date.now()+[1,2,7,15][w.box-1]*DAY; w.weak=false; }
+  }else{
+    btn.classList.add('wrong');
+    btns.forEach(o=>{ if(o.getAttribute('data-correct')==='1') o.classList.add('right'); });
+    markWrong(w.word);
+    if(!mini.wrong.find(x=>x.word===w.word)) mini.wrong.push({word:w.word,mean:w.mean});
+  }
+  saveWords(WORDS); saveState(ST); refreshHome();
+  setTimeout(()=>{ mini.idx++; renderMiniQ(); },1000);
+}
+function finishMini(){
+  const total=mini.total; const rate=total?Math.round(mini.score/total*100):0;
+  const wrongHtml=mini.wrong.length?('<div class="wronglist"><h4>本次错词（已进错词本）</h4>'+mini.wrong.map(x=>'<div class="wr"><b>'+x.word+'</b><span>'+x.mean+'</span></div>').join('')+'</div>'):'';
+  const el=document.getElementById('quizBody'); if(!el) return;
+  el.innerHTML='<div class="examres"><div class="score">'+rate+' 分</div>'
+    +'<div class="verdict '+(rate>=60?'pass':'fail')+'">'+(rate>=90?'满分潜力股！':rate>=60?'不错，继续加油':'多练几遍就熟了')+'</div>'
+    +'<div class="line">共 '+total+' 题，答对 '+mini.score+' 题</div>'
+    +wrongHtml
+    +'<div class="acts"><button class="ghost" onclick="go(\'home\')">回主工作台</button><button onclick="renderQuizLaunch()">再来一组</button></div></div>';
+}
+// 每日提醒：Notification 权限 + 渐进增强（Periodic Background Sync）
+function enableReminder(){
+  if(!('Notification' in window)){ toast('当前浏览器不支持通知，可用首页横幅提醒'); return; }
+  if(Notification.permission==='granted'){ toast('每日提醒已开启 🔔'); registerPeriodic(); return; }
+  if(Notification.permission==='denied'){ toast('通知已被系统拒绝，请在手机设置里允许本应用通知'); return; }
+  Notification.requestPermission().then(function(p){
+    if(p==='granted'){ toast('每日提醒已开启 🔔'); registerPeriodic(); }
+    else toast('没开通知也没关系，首页横幅会提醒你');
+  });
+}
+function registerPeriodic(){
+  if(!('serviceWorker' in navigator) || !('periodicSync' in SyncManager)) return;
+  navigator.serviceWorker.ready.then(function(reg){
+    reg.periodicSync.register('daily-reminder',{minInterval:24*60*60*1000}).catch(function(){});
+  }).catch(function(){});
+}
+function maybeRemind(){
+  try{
+    if(!('Notification' in window) || Notification.permission!=='granted') return;
+    const td=new Date().toISOString().slice(0,10);
+    if((ST.checkins||[]).includes(td)) return;
+    new Notification('欣怡单词星球',{body:'今天还没打卡哦，来背几个单词吧 🔥',icon:'./icon-192.png'});
+  }catch(e){}
 }
 
 /* ====== 口述互动 / AI 智能体对话 ====== */
@@ -4363,7 +4620,7 @@ function answerExam(btn,correctMean){
     ST.points+=5;
   }else{
     const w=exam.list[exam.idx];
-    w.weak=true; w.due=Date.now();
+    markWrong(w.word);
     if(!exam.wrong.find(x=>x.word===w.word)) exam.wrong.push({word:w.word,mean:w.mean});
   }
   saveWords(WORDS); saveState(ST); refreshHome();
@@ -4380,7 +4637,7 @@ function answerSpell(target){
     ST.points+=5;
     document.getElementById('examBody').innerHTML='<div style="text-align:center;padding:40px;color:var(--green);font-size:18px;font-weight:700">答对啦！下一题…</div>';
   }else{
-    w.weak=true; w.due=Date.now();
+    markWrong(w.word);
     if(!exam.wrong.find(x=>x.word===w.word)) exam.wrong.push({word:w.word,mean:w.mean});
     document.getElementById('examBody').innerHTML='<div style="text-align:center;padding:30px"><div style="color:#ff7a7a;font-size:16px;font-weight:700;margin-bottom:8px">差一点～</div><div style="color:var(--sub)">正确拼写：<b style="color:var(--gold)">'+target+'</b></div><div style="color:var(--sub);font-size:13px;margin-top:8px">下一题…</div></div>';
   }
@@ -4444,6 +4701,7 @@ function toast(msg){
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
     navigator.serviceWorker.register('./sw.js').catch(function(e){ console.log('SW skip:', e); });
+    maybeRemind();
   });
 }
 </script>
