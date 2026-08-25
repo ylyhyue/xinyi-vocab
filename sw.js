@@ -1,4 +1,4 @@
-const VERSION = '20260825-c';
+const VERSION = '20260825-d';
 const CACHE = 'xinyi-' + VERSION;
 const CORE = [
   './',
@@ -55,6 +55,19 @@ self.addEventListener('fetch', (e) => {
           })
           .catch(() => {});
         return cached || net;
+      })
+    );
+  }
+});
+
+// 每日提醒（渐进增强）：后台周期性同步时弹一条通知，提醒打卡/背词
+self.addEventListener('periodicsync', (e) => {
+  if (e.tag === 'daily-reminder') {
+    e.waitUntil(
+      self.registration.showNotification('欣怡单词星球', {
+        body: '今天还没打卡哦，来背几个单词吧 🔥',
+        icon: './icon-192.png',
+        badge: './icon-192.png'
       })
     );
   }
